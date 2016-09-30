@@ -7,8 +7,10 @@ public class Turning : BaseAnim {
     public bool setBackToNormal;
     ManageAnimations animManager;
     Quaternion initRotation;
+    Vector3 destRotation = new Vector3 (0,180,0);
+    bool setFinalLerp;
 
-    Vector2 lastTurnVector;
+    Vector3 lastTurnVector;
 
     void Start()
     {
@@ -20,7 +22,7 @@ public class Turning : BaseAnim {
     public override void Enter()
     {
 
-
+        setFinalLerp = false;
         setBackToNormal = false;
         anim.SetTrigger("turn");
         lastTurnVector = new Vector2(animManager.transformedInputX.Value, animManager.transformedInputY.Value);
@@ -28,21 +30,21 @@ public class Turning : BaseAnim {
        
         anim.SetFloat("turningX", lastTurnVector.x);
         anim.SetFloat("turningY", lastTurnVector.y);
-        Debug.Log(lastTurnVector.normalized);
+      //  Debug.Log(lastTurnVector.normalized);
 
     }
 
     public override void Execute()
     {
-       
-
+        
 
     }
 
     public override void Exit()
     {
-        anim.SetFloat("axisX", -lastTurnVector.x);
-        anim.SetFloat("axisY", -lastTurnVector.y);
+
+        anim.SetFloat("axisX", -lastTurnVector.normalized.x * 0.1f);
+        anim.SetFloat("axisY", -lastTurnVector.normalized.y * 0.1f);
     }
 
     public void inverseMovingValues()
@@ -57,13 +59,36 @@ public class Turning : BaseAnim {
         //TODO turn back to normal
 
         turning = false;
+
     }
 
     public void ReturnToPreviousState()
     {
-        Debug.Log("asdasd");
-      
-        animManager.changeAnimation("Walking");
+        if (!setFinalLerp)
+        {
+            setFinalLerp = true;
+            StartCoroutine(FinalLerp());
+        }
+
+    }
+
+    public IEnumerator FinalLerp()
+    {
+        bool execute = true;
+        while (execute)
+        {
+            yield return new WaitForSeconds(0.016f);
+            anim.rootRotation = Quaternion.Euler(anim.rootRotation.eulerAngles + anim.rootRotation.eulerAngles.normalized);
+
+            if (Mathf.Abs(destRotation.y - anim.rootRotation.eulerAngles.y) < 1.5f)
+            {
+                execute = false;
+
+                anim.rootRotation = initRotation;
+                animManager.changeAnimation("Walking");
+                
+            }
+        }
     }
 
 }

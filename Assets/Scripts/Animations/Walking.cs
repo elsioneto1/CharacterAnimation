@@ -38,12 +38,11 @@ public class Walking : BaseAnim {
 
 	}
 
-	
+    Vector3 bla;
 	// Update is called once per frame
     void Update()
     {
-        
-       
+
 	}
 
    
@@ -53,16 +52,12 @@ public class Walking : BaseAnim {
         if (Input.GetKeyDown(KeyCode.Space))
         {
             animationManager.changeAnimation("Turning");
-          //  anim.SetTrigger("turn");
-
-            // turning = true;
-            //TODO insert turning logic
-            
+          
         }
     }
 
-    
 
+    bool idleSet;
     void delegateInputs()
     {
 
@@ -71,25 +66,24 @@ public class Walking : BaseAnim {
             return;
         if (input.magnitude > 0.2f)
         {
-            lastX = _inputX;
-            lastY = _inputY; 
+            lastX = input.x;
+            lastY = input.y;
+            idleSet = false;
         }
         else
         {
             // he's on idle
             // set idle properly
-            if (Mathf.Abs(lastX) > 1.3f)
-            {
-                lastX = 0;
-            }
-            if (Mathf.Abs(lastY) > 1.3f)
-            {
-                lastY = 0;
-            }
 
-            input = new Vector2(lastX, lastY);
-            lastX = input.normalized.x * 0.1f;
-            lastY = input.normalized.y * 0.1f;
+            if (!idleSet)
+            {
+                idleSet = true;
+               
+
+                input = new Vector2(lastX, lastY);
+                lastX = input.normalized.x * 0.1f;
+                lastY = input.normalized.y * 0.1f;
+            }
         }
     }
 
@@ -102,41 +96,36 @@ public class Walking : BaseAnim {
 
     public override void Enter()
     {
-        anim.rootRotation = initRotation;
-        time = 0;
+
+
+        input = new Vector2(anim.GetFloat("axisX"), anim.GetFloat("axisY"));
+        Debug.Log("bla");
     }
-    float time =0;
+
     public override void Execute()
     {
-        time += Time.deltaTime;
-        // Lerp the rotation to match the initial one
-        if (time < 1)
-        {
-            anim.rootRotation = Quaternion.Lerp(anim.rootRotation, initRotation, time);
-        }
+        
 
 
         _inputX = animationManager.transformedInputX.Value;
         _inputY = animationManager.transformedInputY.Value;
 
-        lastX = animationManager.transformedInputX.Value;
-        lastY = animationManager.transformedInputY.Value;
-
-        input = new Vector2(lastX, lastY);
+      
+        input = new Vector2( animationManager.transformedInputX.Value,  animationManager.transformedInputY.Value);
         //_inputX = inputX.Value;
-       // _inputY = inputY.Value;
+        //_inputY = inputY.Value;
        
 
-        checkTurning();
        // transformInputs();
         delegateInputs();
         setInputs();
-      
+        checkTurning();
+
       
     }
 
     public override void Exit()
     {
-
+       
     }
 }
