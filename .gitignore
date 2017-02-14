@@ -1,1 +1,6 @@
 Library/
+Temp/
+obj/Debug/Assembly-CSharp-vs.csproj.FileListAbsolute.txt
+obj/Debug/Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
+obj/Debug/Assembly-CSharp.dll
+obj/Debug/Assembly-CSharp.pdb
