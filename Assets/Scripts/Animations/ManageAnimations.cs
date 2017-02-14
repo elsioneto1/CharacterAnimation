@@ -13,7 +13,7 @@ public class ManageAnimations : MonoBehaviour {
     public float oldInputY;
     public float lastX;
     public float lastY;
-    Vector2 input;
+    public Vector2 input;
     Transform cameraTransform;
     public float dotY;
     public float dotX;
@@ -22,9 +22,14 @@ public class ManageAnimations : MonoBehaviour {
     public string currentAnim;
     public Dictionary<string, BaseAnim> animationPairer = new Dictionary<string,BaseAnim>();
 
+    public Vector2 InputForward;
+
     // bool to give one frame of relief to change the animations
     bool changeAnimationFlag;
     string nextAnimation;
+
+    public Animator anim;
+    public CameraRotation CamRotation;
 
 	// Use this for initialization
 	void Start () {
@@ -36,18 +41,10 @@ public class ManageAnimations : MonoBehaviour {
             anims[i].inputY = InputY;
         }
         cameraTransform = Camera.main.transform;
-
+        anim = GetComponent<Animator>();
 	}
 	
-    void lockUpdate()
-    {
 
-    }
-
-    void unlockUpdate()
-    {
-
-    }
 	// Update is called once per frame
 	void Update () {
 
@@ -90,23 +87,31 @@ public class ManageAnimations : MonoBehaviour {
     void getInput()
     {
 
-        // IF THE INPUT IS TOO SMALL, DONT VALUE IT
+
         InputX.Value = -Input.GetAxis("Horizontal");
         InputY.Value = Input.GetAxis("Vertical");
-        
+
     }
 
 
     void transformInputs()
     {
+
+        Vector3 bodyRotation = anim.rootRotation.eulerAngles;
+
+        float orientationX = Mathf.Cos((bodyRotation.y / 180) * Mathf.PI);
+        float orientationY = Mathf.Sin((bodyRotation.y / 180) * Mathf.PI);
+
+
         //transitate inputs first
         Vector2 oldInputs = new Vector2(oldInputX , oldInputY);
         Vector2 newInputs = new Vector2(InputX.Value, InputY.Value);
 
-        float tempInputX = oldInputX;
+        float tempInputX = oldInputX;   
         float tempInputY = oldInputY;
-        tempInputX -= (oldInputs.x - newInputs.x) * 0.2f;
-        tempInputY -= (oldInputs.y - newInputs.y) * 0.2f;
+        // apply easing
+        tempInputX -= (oldInputs.x - newInputs.x) * 0.05f;
+        tempInputY -= (oldInputs.y - newInputs.y) * 0.05f;
 
 
         oldInputX = tempInputX;
@@ -117,12 +122,39 @@ public class ManageAnimations : MonoBehaviour {
 
 
         input = new Vector2(transformedInputX.Value, transformedInputY.Value);
-        Vector2 forward = new Vector2(cameraTransform.forward.x, cameraTransform.forward.z);
-        Vector2 right = new Vector2(cameraTransform.right.x, cameraTransform.right.z);
+        Vector3 bodyForward = cameraTransform.forward;
+        Vector3 bodyRight = cameraTransform.right;
+
+        // fix the input in relation to the root rotation
+        Matrix4x4 rotationMatrix = new Matrix4x4();
+        float rad = (anim.rootRotation.eulerAngles.y/180) * Mathf.PI;
+        
+        // vai entender ne amiguinho. 
+        // aparentemente, o eixo x ta todo cagado invertendo a porra toda e isso ta resolvendo
+        rad = -rad;
+      //  MathOperations.RotateVector(ref bodyForward, rad);
+      //  MathOperations.RotateVector(ref bodyRight, rad);
+
+        rotationMatrix.SetRow(0, new Vector4(Mathf.Cos(rad),0,Mathf.Sin(rad),0));
+        rotationMatrix.SetRow(1, new Vector4(0,0,0,0));
+        rotationMatrix.SetRow(2, new Vector4(-Mathf.Sin(rad), 0, Mathf.Cos(rad), 0));
+        rotationMatrix.SetRow(3, new Vector4(0, 0, 0, 1));
+        bodyForward = rotationMatrix.MultiplyVector(bodyForward);
+        bodyRight = rotationMatrix.MultiplyVector(bodyRight);
+
+        Vector2 forward = new Vector2(bodyForward.x, bodyForward.z);
+        Vector2 right = new Vector2(bodyRight.x, bodyRight.z);
         dotY = Vector2.Dot(input, forward);
         dotX = Vector2.Dot(input, right);
 
-        transformedInputX.Value = -dotX;
+        
+
+ 
+        float _dotX = -dotX ;
+        float _dotY = dotY;
+
+     
+        transformedInputX.Value = _dotX;
         transformedInputY.Value = dotY;
 
 

@@ -32,7 +32,7 @@ public class CameraRotation : MonoBehaviour {
         // gather the values individually
         float cosInput = Mathf.Sin(angle);
         float sinInput = Mathf.Cos(angle);
-
+            
         Vector3 pivotPosition = new Vector3(cosInput,0,sinInput); 
         // set the point position in relation to the character
         cameraPivot.position = -pivotPosition * 5 + new Vector3(parentTransform.position.x, 15, parentTransform.position.z);

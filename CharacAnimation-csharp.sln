@@ -1,7 +1,7 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2008
 
-Project("{16CA86A8-D95A-1E4B-6BF7-752780BF20A0}") = "CharacAnimation", "Assembly-CSharp.csproj", "{5A5ED024-38BB-6210-5DC5-629563A5785F}"
+Project("{16CA86A8-D95A-1E4B-6BF7-752780BF20A0}") = "CharacAnimation", "Assembly-CSharp-vs.csproj", "{5A5ED024-38BB-6210-5DC5-629563A5785F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,7 +17,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-																														GlobalSection(MonoDevelopProperties) = preSolution
+																															GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Assembly-CSharp.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1
